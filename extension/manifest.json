@@ -53,7 +53,7 @@
     }
   ],
   "homepage_url": "https://darazcashback.com",
-  "privacy_policy": "https://raw.githubusercontent.com/YOUR_USERNAME/daraz-cashback/main/docs/PRIVACY_POLICY.md",
+  "privacy_policy": "https://KARIK-x.github.io/Dz/PRIVACY_POLICY.html",
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   }
