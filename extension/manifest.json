@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Daraz Cashback",
+  "version": "1.0.0",
+  "description": "Earn cashback on every Daraz purchase. Get Rs. 5 per purchase through our affiliate partnership.",
+  "author": "Your Company Name",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.daraz.com.np/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.daraz.com.np/*"
+      ],
+      "js": [
+        "content/content.js"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content/widget.html"
+      ],
+      "matches": [
+        "https://www.daraz.com.np/*"
+      ]
+    }
+  ],
+  "homepage_url": "https://darazcashback.com",
+  "privacy_policy": "https://raw.githubusercontent.com/YOUR_USERNAME/daraz-cashback/main/docs/PRIVACY_POLICY.md",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

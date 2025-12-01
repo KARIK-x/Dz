@@ -1,0 +1,136 @@
+===========================================================
+ANTIGRAVITY DIAGNOSIS - Redirect Route Error Report
+===========================================================
+Date: 2025-11-30 17:07:31 +05:45
+Engineer: Senior Backend Engineer (Automated Diagnosis)
+File: backend/routes/redirect.routes.js
+Node Version: v23.6.0
+
+===========================================================
+ERROR IDENTIFICATION & REPRODUCTION
+===========================================================
+
+COMMAND: Static code analysis of redirect.routes.js
+TIMESTAMP: 2025-11-30 17:07:45
+
+ERRORS FOUND (9 total):
+
+1. **SYNTAX ERROR - Line 43**: Invalid identifier with space
+   Location: config.DAR AZ_AFFILIATE_BASE_URL
+   Expected: config.DARAZ_AFFILIATE_BASE_URL
+   Impact: SyntaxError - will fail to parse
+   Severity: CRITICAL
+
+2. **SYNTAX ERROR - Line 43-44**: Malformed template string
+   Current: `${config.DAR AZ_AFFILIATE_BASE_URL\n    }/products/${ decoded.productId } `
+   Issue: Newline breaking template expression, spaces around interpolation
+   Impact: SyntaxError or unexpected whitespace in URL
+   Severity: CRITICAL
+
+3. **LOGIC ERROR - Line 44**: Unnecessary spaces in template
+   Current: ${ decoded.productId }
+   Expected: ${decoded.productId}
+   Impact: Whitespace in URL path
+   Severity: HIGH
+
+4. **LOGIC ERROR - Line 48**: Weak IP extraction
+   Current: req.ip || req.connection.remoteAddress
+   Issue: req.connection deprecated, doesn't handle X-Forwarded-For
+   Impact: Incorrect IP logging behind proxies/load balancers
+   Severity: MEDIUM
+
+5. **LOGIC ERROR - Line 59**: Unnecessary spaces in template
+   Current: ${ activation._id } → ${ affiliateUrl }
+   Expected: ${activation._id} → ${affiliateUrl}
+   Impact: Console logging cosmetic issue
+   Severity: LOW
+
+6. **LOGIC ERROR - Line 87**: Spaces in query parameter assignment
+   Current: aff_code = ${ config.AFFILIATE_CODE }
+   Expected: aff_code=${config.AFFILIATE_CODE}
+   Impact: Malformed query string with literal spaces
+   Severity: HIGH
+
+7. **LOGIC ERROR - Line 87**: Multiple spacing issues in fallback URL
+   Current: ${ productUrl }${ separator } aff_code = ...
+   Expected: ${productUrl}${separator}aff_code=...
+   Impact: Invalid URL with spaces
+   Severity: HIGH
+
+8. **LOGIC ERROR - Line 87**: Trailing space in template
+   Current: aff_trace=${ activationId }
+   Expected: aff_trace=${activationId}
+   Impact: Whitespace in query parameter value
+   Severity: MEDIUM
+
+9. **MISSING ERROR HANDLING - Line 52**: Click log creation not error-handled
+   Current: await ClickLog.create(...)
+   Issue: If ClickLog fails, redirect is blocked
+   Recommendation: Wrap in try-catch, log error but continue redirect
+   Severity: MEDIUM
+
+===========================================================
+EXPECTED BEHAVIOR VS ACTUAL
+===========================================================
+
+EXPECTED:
+  GET /r/<valid-token>
+  → 302 Redirect
+  → Location: https://www.daraz.com.np/products/12345?aff_code=XXX&aff_trace=ABC&aff_source=daraz_cashback_ext
+
+ACTUAL (with current errors):
+  GET /r/<valid-token>
+  → SyntaxError: Unexpected identifier 'AZ_AFFILIATE_BASE_URL'
+  → Server fails to start
+
+===========================================================
+DEPENDENCY CHECK
+===========================================================
+
+COMMAND: npm install (in progress)
+STATUS: Installing dependencies...
+
+Required dependencies from package.json:
+  - express: ^4.18.2
+  - mongoose: ^8.0.0
+  - jsonwebtoken: ^9.0.2
+  - crypto: ^1.0.1
+
+===========================================================
+CONFIGURATION VALIDATION
+===========================================================
+
+Checked: backend/config.js
+Correct variable name: DARAZ_AFFILIATE_BASE_URL (line 22)
+Value: 'https://www.daraz.com.np'
+
+Mismatch confirmed:
+  redirect.routes.js uses: DAR AZ_AFFILIATE_BASE_URL (with space)
+  config.js exports: DARAZ_AFFILIATE_BASE_URL (no space)
+
+===========================================================
+SECURITY AUDIT
+===========================================================
+
+Located sensitive values (properly handled as placeholders):
+  - config.AFFILIATE_CODE (line 21, 78, 87)
+  - All marked as PLACEHOLDER in config.js
+  - No leakage in console.log statements (lines masked)
+
+PASS: No secrets exposed in error logs or console output
+
+===========================================================
+NEXT STEPS
+===========================================================
+
+1. Fix syntax errors (lines 43-44)
+2. Fix query parameter spacing (line 87)
+3. Improve IP extraction (line 48)
+4. Add error handling for ClickLog (line 52)
+5. Run linter: npx eslint backend/routes/redirect.routes.js
+6. Run tests: npm test
+7. Run smoke tests: curl -I GET /r/<test-token>
+
+===========================================================
+END OF DIAGNOSIS
+===========================================================

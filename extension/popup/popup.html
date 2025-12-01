@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daraz Cashback</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M16 4L4 10L16 16L28 10L16 4Z" fill="#00BFA5"/>
+          <path d="M4 22L16 28L28 22" stroke="#00BFA5" stroke-width="2"/>
+        </svg>
+        <h1>Daraz Cashback</h1>
+      </div>
+    </header>
+
+    <!-- Balance Section -->
+    <section class="balance-section">
+      <div class="balance-card">
+        <div class="balance-label">Available Balance</div>
+        <div class="balance-amount" id="balance-amount">
+          <span class="currency">Rs.</span>
+          <span class="amount" id="amount-value">0</span>
+        </div>
+        <div class="balance-subtitle" id="total-earned">Total earned: Rs. 0</div>
+      </div>
+      
+      <button class="payout-btn" id="payout-btn" disabled>
+        Request Payout
+      </button>
+      <div class="payout-note">Minimum payout: Rs. 100</div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="stat-item">
+        <div class="stat-value" id="total-activations">0</div>
+        <div class="stat-label">Activations</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="pending-count">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="approved-count">0</div>
+        <div class="stat-label">Approved</div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="history">History</button>
+      <button class="tab-btn" data-tab="settings">Settings</button>
+      <button class="tab-btn" data-tab="info">Info</button>
+    </div>
+
+    <!-- History Tab -->
+    <div class="tab-content active" id="history-tab">
+      <div class="history-list" id="history-list">
+        <!-- History items will be injected here -->
+        <div class="empty-state" id="empty-state">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="30" stroke="#E0E0E0" stroke-width="2"/>
+            <path d="M32 16V32L42 42" stroke="#E0E0E0" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <p>No activations yet</p>
+          <small>Visit a Daraz product page to start earning cashback!</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="settings-tab">
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-title">Enable Notifications</div>
+            <div class="setting-description">Get notified when cashback is approved</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notifications-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-title">Anonymous Analytics</div>
+            <div class="setting-description">Help improve the extension (no personal data)</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="telemetry-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="setting-title">User ID</div>
+            <div class="setting-description" id="user-id-display">Loading...</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="settings-actions">
+        <button class="btn-secondary" id="clear-data-btn">Clear Local Data</button>
+      </div>
+    </div>
+
+    <!-- Info Tab -->
+    <div class="tab-content" id="info-tab">
+      <div class="info-content">
+        <h3>How It Works</h3>
+        <ol class="info-steps">
+          <li>
+            <strong>Visit Daraz Product</strong>
+            <p>Browse products on Daraz.com.np as usual</p>
+          </li>
+          <li>
+            <strong>Activate Cashback</strong>
+            <p>Click the widget when it appears on product pages</p>
+          </li>
+          <li>
+            <strong>Complete Purchase</strong>
+            <p>Buy the product through our affiliate link</p>
+          </li>
+          <li>
+            <strong>Earn Rs. 5</strong>
+            <p>Get cashback credited once purchase is verified</p>
+          </li>
+        </ol>
+        
+        <h3>Commission Disclosure</h3>
+        <p class="info-text">
+          We earn Rs. 30 from Daraz for each purchase. You receive Rs. 5 as cashback. 
+          This is a transparent affiliate partnership.
+        </p>
+        
+        <h3>Privacy & Data</h3>
+        <p class="info-text">
+          We don't collect personal information. Only product IDs and timestamps are recorded.
+        </p>
+        
+        <div class="info-links">
+          <a href="https://your-website.com/privacy" target="_blank">Privacy Policy</a>
+          <a href="https://your-website.com/terms" target="_blank">Terms of Service</a>
+          <a href="https://your-website.com/support" target="_blank">Support</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payout Modal -->
+    <div class="modal" id="payout-modal" style="display: none;">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <h2>Request Payout</h2>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="payout-amount">Amount (Rs.)</label>
+            <input type="number" id="payout-amount" readonly>
+          </div>
+          
+          <div class="form-group">
+            <label for="payout-method">Payment Method</label>
+            <select id="payout-method">
+              <option value="esewa">eSewa</option>
+              <option value="khalti">Khalti</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="payout-identifier">Phone/Email</label>
+            <input type="text" id="payout-identifier" placeholder="Enter your eSewa/Khalti ID">
+            <small>We only store a hashed version for privacy</small>
+          </div>
+          
+          <div class="info-box">
+            <p><strong>Processing Time:</strong> 7-14 days after verification</p>
+            <p><strong>KYC Required:</strong> First-time payout requires verification</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancel-payout-btn">Cancel</button>
+          <button class="btn-primary" id="confirm-payout-btn">Confirm Request</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <small>Version 1.0.0 | <a href="https://your-website.com" target="_blank">Website</a></small>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

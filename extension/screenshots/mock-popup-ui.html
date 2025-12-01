@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daraz Cashback - Extension Popup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 380px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-container {
+            width: 360px;
+            height: 580px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .popup-header h1 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .popup-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .balance-section {
+            padding: 24px 20px;
+            background: linear-gradient(180deg, #f0fdf4 0%, white 100%);
+        }
+
+        .balance-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: bold;
+            color: #10B981;
+            margin-bottom: 16px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .payout-button {
+            width: 100%;
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .payout-button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .history-section {
+            padding: 0 20px 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .view-all {
+            font-size: 12px;
+            color: #10B981;
+            text-decoration: none;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .history-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .history-details {
+            flex: 1;
+        }
+
+        .history-product {
+            font-size: 13px;
+            color: #1f2937;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .history-amount {
+            font-size: 14px;
+            font-weight: 600;
+            color: #10B981;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 20px;
+            margin-top: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: #10B981;
+            font-weight: 600;
+            border-bottom-color: #10B981;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="popup-container">
+        <div class="popup-header">
+            <h1>Daraz Cashback</h1>
+            <p>Transparent rewards for smart shoppers</p>
+        </div>
+
+        <div class="balance-section">
+            <div class="balance-card">
+                <div class="balance-label">Available Balance</div>
+                <div class="balance-amount">Rs. 45</div>
+
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-value">125</div>
+                        <div class="stat-label">Total Earned</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">9</div>
+                        <div class="stat-label">Activations</div>
+                    </div>
+                </div>
+
+                <button class="payout-button" disabled>
+                    Request Payout (Min Rs. 100)
+                </button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active">History</div>
+            <div class="tab">Settings</div>
+            <div class="tab">Info</div>
+        </div>
+
+        <div class="history-section">
+            <div class="section-title">
+                <span>Recent Activations</span>
+                <a href="#" class="view-all">View All</a>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">🎁</div>
+                <div class="history-details">
+                    <div class="history-product">Samsung Galaxy A54 5G</div>
+                    <div class="history-date">Today, 2:30 PM</div>
+                </div>
+                <div class="history-amount">+Rs. 5</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">🎁</div>
+                <div class="history-details">
+                    <div class="history-product">Nike Air Max Shoes</div>
+                    <div class="history-date">Yesterday, 6:45 PM</div>
+                </div>
+                <div class="history-amount">+Rs. 5</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">🎁</div>
+                <div class="history-details">
+                    <div class="history-product">HP Laptop 15s</div>
+                    <div class="history-date">Nov 28, 11:20 AM</div>
+                </div>
+                <div class="history-amount">+Rs. 5</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,392 @@
+===========================================================
+EXTENSION SMOKE TEST LOG - Manual Verification
+===========================================================
+Date: 2025-11-30 17:55:12 +05:45
+Version: 1.0.0
+Engineer: Senior Release Engineer
+
+===========================================================
+TEST ENVIRONMENT
+===========================================================
+
+Browser: Chrome 120+ (required)
+Extension: Loaded unpacked from /extension directory
+Backend: Local development server (http://localhost:3000)
+Database: MongoDB (local)
+
+===========================================================
+PRE-TEST SETUP
+===========================================================
+
+ ☐ Install dependencies: cd backend && npm install
+☐ Start MongoDB: mongod OR docker run mongo:7
+☐ Configure .env with test secrets
+☐ Start backend: npm run dev
+☐ Load extension in Chrome: chrome://extensions/ → Load unpacked
+
+===========================================================
+TEST CASE 1: Extension Loading
+===========================================================
+
+Steps:
+1. Open Chrome
+2. Navigate to chrome://extensions/
+3. Enable "Developer mode"
+4. Click "Load unpacked"
+5. Select extension/ directory
+
+Expected:
+✓ Extension loads without errors
+✓ Icon appears in Chrome toolbar
+✓ No console errors in background page
+✓ Service worker registered successfully
+
+Actual: PENDING (manual test required)
+
+===========================================================
+TEST CASE 2: Product Page Detection
+===========================================================
+
+Steps:
+1. Navigate to https://www.daraz.com.np/products/
+2. Open any product page (e.g., electronics, fashion)
+3. Wait 3 seconds
+4. Look for floating cashback widget
+
+Expected:
+✓ Widget appears within 3 seconds
+✓ Widget shows "Earn Rs. 5 Cashback" message
+✓ Widget is positioned correctly (bottom-right, not blocking content)
+✓ Widget has smooth fade-in animation
+✓ No console errors
+
+Actual: PENDING (requires live Daraz page)
+
+Test URLs:
+- https://www.daraz.com.np/products/sample-product-123/
+- https://www.daraz.com.np/catalog/?q=laptop
+
+===========================================================
+TEST CASE 3: Widget Interaction
+===========================================================
+
+Steps:
+1. On product page with widget visible
+2. Click "Activate Cashback" button
+3. Observe confirmation modal
+
+Expected:
+✓ Modal opens with smooth animation
+✓ Modal shows transparent disclosure:
+  - "We earn: Rs. 30 commission"
+  - "You get: Rs. 5 cashback"
+✓ Modal has "Confirm" and "Cancel" buttons
+✓ Modal is keyboard accessible (Tab, Enter, Esc)
+✓ Background is dimmed with overlay
+
+Actual: PENDING (requires manual test)
+
+===========================================================
+TEST CASE 4: Activation Flow
+===========================================================
+
+Steps:
+1. In confirmation modal, click "Confirm"
+2. Monitor network tab (F12 → Network)
+3. Observe backend API call
+
+Expected:
+✓ POST request to /api/activate
+✓ Request includes:
+  - hashedUserId
+  - productId
+  - productTitle
+  - HMAC signature
+✓ Response HTTP 200
+✓ Response contains: { activationId, redirectUrl, expiresIn: 300 }
+✓ User is redirected to signed URL (/r/TOKEN)
+
+Actual: PENDING (requires backend running)
+
+===========================================================
+TEST CASE 5: Redirect Endpoint
+===========================================================
+
+Steps:
+1. After activation, browser redirects to /r/:token
+2. Observe redirect behavior
+
+Expected:
+✓ HTTP 302 redirect
+✓ Location header points to:
+  https://www.daraz.com.np/products/[ID]?aff_code=XXX&aff_trace=YYY&aff_source=daraz_cashback_ext
+✓ NO SPACES in query parameters
+✓ Redirect completes within 500ms
+✓ ClickLog entry created in database
+
+Actual: PENDING (requires backend + activation)
+
+Verification Command:
+```bash
+curl -I http://localhost:3000/r/TEST_TOKEN
+# Expected: HTTP/1.1 302 Found
+# Location: https://www.daraz.com.np/...?aff_code=...
+```
+
+===========================================================
+TEST CASE 6: Popup UI - Balance Display
+===========================================================
+
+Steps:
+1. Click extension icon in Chrome toolbar
+2. Observe popup UI
+
+Expected:
+✓ Popup opens (300x500px approximately)
+✓ Shows current balance: Rs. 0 (for new user)
+✓ Shows total earned: Rs. 0
+✓ Shows activation count: 0
+✓ UI is clean, modern, readable
+✓ Tabs: History, Settings, Info
+
+Actual: PENDING (manual test)
+
+===========================================================
+TEST CASE 7: Activation History
+===========================================================
+
+Steps:
+1. After activating cashback (Test Case 4)
+2. Open popup
+3. Click "History" tab
+
+Expected:
+✓ Shows list of past activations
+✓ Each activation shows:
+  - Product title
+  - Amount (Rs. 5)
+  - Status badge (pending/completed)
+  - Date/time
+✓ Empty state message if no history
+✓ Scrollable list
+
+Actual: PENDING
+
+===========================================================
+TEST CASE 8: Payout Request (UI Only)
+===========================================================
+
+Steps:
+1. Open popup
+2. Click "Request Payout" button
+3. Fill payout modal:
+   - Amount: Rs. 100
+   - Method: eSewa
+   - Phone/Email: test@example.com
+
+Expected:
+✓ Button disabled if balance < Rs. 100
+✓ Modal opens with input fields
+✓ Method dropdown: eSewa, Khalti
+✓ Validation for minimum Rs. 100
+✓ Phone/email hashed before sending
+✓ POST /api/payout called
+✓ Success message shown
+
+Actual: PENDING (requires balance >= Rs. 100)
+
+===========================================================
+TEST CASE 9: Deduplication
+===========================================================
+
+Steps:
+1. Activate cashback on a product
+2. Wait 1 minute
+3. Refresh page and try to activate again
+
+Expected:
+✓ Widget still appears
+✓ Clicking "Activate" shows error:
+  "Cashback already activated for this product within 24 hours"
+✓ No duplicate API call
+✓ User sees friendly error message
+
+Actual: PENDING
+
+===========================================================
+TEST CASE 10: Rate Limiting
+===========================================================
+
+Steps:
+1. Activate cashback on 10 different products within 1 hour
+2. Try to activate on 11th product
+
+Expected:
+✓ First 10 activations succeed
+✓ 11th activation fails with:
+  "Too many activation requests. Maximum 10 per hour."
+✓ HTTP 429 response
+✓ User-friendly error in widget
+
+Actual: PENDING
+
+===========================================================
+TEST CASE 11: Consent Logging
+===========================================================
+
+Steps:
+1. Perform activation flow (Test Case 4)
+2. Check backend MongoDB database
+
+Expected:
+✓ ConsentEvent document created with:
+  - consentId (UUID)
+  - hashedUserId
+  - action: "consent_given"
+  - timestamp
+  - ipAddress
+  - userAgent
+  - consentText snapshot
+✓ TTL index set (12-month auto-deletion)
+
+Actual: PENDING (requires DB access)
+
+Verification Command:
+```bash
+mongosh daraz_cashback
+db.consentevents.find().limit(1)
+```
+
+===========================================================
+TEST CASE 12: Accessibility
+===========================================================
+
+Steps:
+1. Load product page with widget
+2. Use keyboard only (Tab, Enter, Esc)
+3. Test with screen reader (optional)
+
+Expected:
+✓ Widget focusable via Tab
+✓ Activate button triggered by Enter
+✓ Modal closes with Esc
+✓ Focus trapped in modal when open
+✓ ARIA labels present
+✓ Color contrast ratio >= 4.5:1
+
+Actual: PENDING (manual accessibility audit)
+
+===========================================================
+TEST CASE 13: Error Handling
+===========================================================
+
+Steps:
+1. Stop backend server
+2. Try to activate cashback
+3. Observe error handling
+
+Expected:
+✓ Widget shows error message: "Connection failed. Please try again."
+✓ No browser console errors (caught gracefully)
+✓ User can retry without refreshing
+✓ Timeout after 10 seconds
+
+Actual: PENDING
+
+===========================================================
+TEST CASE 14: Cross-Browser (Future)
+===========================================================
+
+Status: DEFERRED (Chrome only for v1.0.0)
+
+Future testing required for:
+- Firefox (would need MV3 manifest adjustments)
+- Edge (Chromium-based, likely compatible)
+- Safari (major rewrite needed)
+
+===========================================================
+PERFORMANCE TESTS
+===========================================================
+
+Test Case A: Widget Load Time
+Expected: Widget appears < 3 seconds after page load
+Actual: PENDING
+
+Test Case B: API Call Latency
+Expected: /api/activate responds < 500ms
+Actual: PENDING
+
+Test Case C: Database Query Time
+Expected: User balance query < 200ms
+Actual: PENDING
+
+===========================================================
+SECURITY TESTS
+===========================================================
+
+Test Case S1: HMAC Validation
+- Try sending activation without valid HMAC → Expect 401
+- Try expired HMAC (replay attack) → Expect 401
+
+Test Case S2: JWT Token Expiry
+- Generate redirect token, wait 6 minutes → Expect 401
+
+Test Case S3: XSS Prevention
+- Try injecting <script> in product title → Expect escaped
+
+Test Case S4: CSRF Protection
+- Try calling /api/activate from external site → Expect CORS error
+
+All: PENDING (requires security testing)
+
+===========================================================
+SUMMARY
+===========================================================
+
+Total Test Cases: 14 functional + 3 performance + 4 security = 21
+Passed: 0 (manual testing required)
+Failed: 0
+Pending: 21
+
+===========================================================
+TESTING INSTRUCTIONS FOR QA
+===========================================================
+
+1. Set up environment:
+   ```bash
+   cd backend
+   npm install
+   cp ../.env.test ../.env
+   # Edit .env with test secrets
+   npm run dev
+   ```
+
+2. Load extension:
+   - Open chrome://extensions/
+   - Enable Developer mode
+   - Load unpacked → select extension/ folder
+
+3. Run manual tests:
+   - Follow test cases 1-14 above
+   - Document results in release/QA_RESULTS.txt
+   - Screenshot any failures
+
+4. Report blockers immediately:
+   - Widget not showing → Code issue
+   - Backend errors → Server issue
+   - Redirect fails → config.DARAZ_AFFILIATE_BASE_URL check
+
+===========================================================
+BLOCKERS FOR AUTOMATED TESTING
+===========================================================
+
+1. No Puppeteer/Playwright setup → Add E2E framework
+2. No Jest configuration → Add test runner
+3. No test fixtures → Create sample Daraz HTML pages
+4. No CI/CD → GitHub Actions needed
+
+Recommendation: Manual QA for v1.0.0, automate in v1.1.0
+
+===========================================================
+END OF SMOKE TEST LOG
+===========================================================

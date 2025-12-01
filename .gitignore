@@ -1,0 +1,32 @@
+node_modules/
+dist/
+build/
+*.log
+.env
+.DS_Store
+ 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Database
+data/
+*.sqlite
+
+# Chrome Extension
+extension.zip
+extension.crx
+
+# Secrets
+*.pem
+*.key
+secrets.json
+
+# OS
+Thumbs.db
